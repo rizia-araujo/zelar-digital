@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect
 from app.models.db import mysql
+from flask_login import login_required, current_user
 import os
 
 reports = Blueprint('reports', __name__)
+
 
 @reports.route('/')
 def home():
@@ -10,6 +12,7 @@ def home():
 
 
 @reports.route('/create-report', methods=['GET', 'POST'])
+@login_required
 def create_report():
 
     if request.method == 'POST':
@@ -33,8 +36,16 @@ def create_report():
         cursor.execute(
             """
             INSERT INTO reports
-            (title, description, image, latitude, longitude, status)
-            VALUES(%s, %s, %s, %s, %s, %s)
+            (
+                title,
+                description,
+                image,
+                latitude,
+                longitude,
+                status,
+                user_id
+            )
+            VALUES(%s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 title,
@@ -42,7 +53,8 @@ def create_report():
                 image.filename,
                 latitude,
                 longitude,
-                'recebido'
+                'recebido',
+                current_user.id
             )
         )
 
