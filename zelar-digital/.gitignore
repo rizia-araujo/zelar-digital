@@ -1,0 +1,12 @@
+venv/
+.env
+__pycache__/
+*.pyc
+
+app/static/uploads/
+
+.vscode/
+.idea/
+
+Thumbs.db
+.DS_Store
