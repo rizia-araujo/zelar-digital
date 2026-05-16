@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Ocorrências</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet/dist/leaflet.css"
+    />
+
+    <style>
+
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+
+        .card {
+
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+
+        }
+
+        img {
+
+            width: 300px;
+            border-radius: 10px;
+
+        }
+
+        #map {
+
+            height: 500px;
+            margin-bottom: 30px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Ocorrências da Cidade</h1>
+
+    <div id="map"></div>
+
+    {% for report in reports %}
+
+        <div class="card">
+
+            <h2>{{ report[1] }}</h2>
+
+            <p>{{ report[2] }}</p>
+
+            <p>
+                <strong>Status:</strong>
+                {{ report[6] }}
+            </p>
+
+            <img
+                src="{{ url_for('static', filename='uploads/' + report[3]) }}"
+            >
+
+            <p>
+                Latitude: {{ report[4] }}
+            </p>
+
+            <p>
+                Longitude: {{ report[5] }}
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+
+        const map = L.map('map').setView([-10.1847, -48.3336], 13);
+
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                attribution: 'OpenStreetMap'
+            }
+        ).addTo(map);
+
+        const reports = {{ reports | tojson }};
+
+        reports.forEach(report => {
+
+            const lat = report[4];
+            const lng = report[5];
+
+            const marker = L.marker([lat, lng]).addTo(map);
+
+            marker.bindPopup(`
+                <b>${report[1]}</b><br>
+                ${report[6]}
+            `);
+
+        });
+
+    </script>
+
+</body>
+</html>

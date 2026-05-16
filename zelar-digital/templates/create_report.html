@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Criar Ocorrência</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet/dist/leaflet.css"
+    />
+
+    <style>
+
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Nova Ocorrência</h1>
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <input
+            type="text"
+            name="title"
+            placeholder="Título"
+            required
+        >
+
+        <br><br>
+
+        <textarea
+            name="description"
+            placeholder="Descrição"
+            required
+        ></textarea>
+
+        <br><br>
+
+        <input
+            type="file"
+            name="image"
+            required
+        >
+
+        <br><br>
+
+        <input
+            type="hidden"
+            name="latitude"
+            id="latitude"
+        >
+
+        <input
+            type="hidden"
+            name="longitude"
+            id="longitude"
+        >
+
+        <button type="submit">
+            Enviar ocorrência
+        </button>
+
+    </form>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+
+        const map = L.map('map').setView([-10.1847, -48.3336], 13);
+
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                attribution: 'OpenStreetMap'
+            }
+        ).addTo(map);
+
+        let marker;
+
+        navigator.geolocation.getCurrentPosition((position) => {
+
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            map.setView([lat, lng], 15);
+
+            marker = L.marker([lat, lng]).addTo(map);
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+        });
+
+        map.on('click', function(e) {
+
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+        });
+
+    </script>
+
+</body>
+</html>

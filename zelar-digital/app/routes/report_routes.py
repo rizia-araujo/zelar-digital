@@ -64,3 +64,31 @@ def create_report():
         return redirect('/')
 
     return render_template('create_report.html')
+@reports.route('/reports')
+def list_reports():
+
+    cursor = mysql.connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            title,
+            description,
+            image,
+            latitude,
+            longitude,
+            status
+        FROM reports
+        ORDER BY created_at DESC
+        """
+    )
+
+    reports_data = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template(
+        'reports.html',
+        reports=reports_data
+    )
