@@ -1,127 +1,98 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+{% extends "base.html" %}
+{% block title %}Nova ocorrência | Zelar Digital{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h1>Nova ocorrência</h1>
+        <p>Preencha os dados, marque o ponto no mapa e envie a foto da situação.</p>
+      </div>
+      <div class="toolbar">
+        <span class="pill">Mapa interativo</span>
+        <span class="pill">Foto obrigatória</span>
+        <span class="pill">Geolocalização</span>
+      </div>
+    </div>
 
-    <meta charset="UTF-8">
-    <title>Criar Ocorrência</title>
+    <div class="form-shell">
+      <div class="panel form-card">
+        <form method="POST" enctype="multipart/form-data" class="form-grid">
+          <div class="field">
+            <label for="title">Título</label>
+            <input type="text" name="title" id="title" placeholder="Ex.: Iluminação pública apagada" required>
+          </div>
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet/dist/leaflet.css"
-    />
+          <div class="field">
+            <label for="description">Descrição</label>
+            <textarea name="description" id="description" placeholder="Descreva o problema com detalhes" required></textarea>
+          </div>
 
-    <style>
+          <div class="field">
+            <label for="image">Imagem</label>
+            <input type="file" name="image" id="image" accept="image/*" required>
+          </div>
 
-        #map {
-            height: 400px;
-            width: 100%;
-            margin-top: 20px;
-        }
+          <div class="field">
+            <label>Coordenadas</label>
+            <div class="helper">Latitude e longitude serão preenchidas automaticamente ao clicar no mapa ou ao permitir a localização.</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+              <input type="text" name="latitude" id="latitude" placeholder="Latitude" readonly required>
+              <input type="text" name="longitude" id="longitude" placeholder="Longitude" readonly required>
+            </div>
+          </div>
 
-    </style>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Enviar ocorrência</button>
+        </form>
+      </div>
 
-</head>
+      <div class="panel map-card">
+        <div class="map-overlay">
+          <strong>Escolha a localização</strong>
+          <div class="helper">Clique no mapa ou use sua localização atual. O marcador será ajustado automaticamente.</div>
+        </div>
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
 
-<body>
+{% block scripts %}
+<script>
+  const map = L.map('map').setView([-10.1847, -48.3336], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap'
+  }).addTo(map);
 
-    <h1>Nova Ocorrência</h1>
+  let marker = null;
 
-    <form
-        method="POST"
-        enctype="multipart/form-data"
-    >
+  function setCoords(lat, lng) {
+    document.getElementById('latitude').value = Number(lat).toFixed(7);
+    document.getElementById('longitude').value = Number(lng).toFixed(7);
+  }
 
-        <input
-            type="text"
-            name="title"
-            placeholder="Título"
-            required
-        >
+  function setMarker(lat, lng) {
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
+    setCoords(lat, lng);
+  }
 
-        <br><br>
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      map.setView([lat, lng], 16);
+      setMarker(lat, lng);
+    }, () => {
+      setMarker(-10.1847, -48.3336);
+    });
+  } else {
+    setMarker(-10.1847, -48.3336);
+  }
 
-        <textarea
-            name="description"
-            placeholder="Descrição"
-            required
-        ></textarea>
-
-        <br><br>
-
-        <input
-            type="file"
-            name="image"
-            required
-        >
-
-        <br><br>
-
-        <input
-            type="hidden"
-            name="latitude"
-            id="latitude"
-        >
-
-        <input
-            type="hidden"
-            name="longitude"
-            id="longitude"
-        >
-
-        <button type="submit">
-            Enviar ocorrência
-        </button>
-
-    </form>
-
-    <div id="map"></div>
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <script>
-
-        const map = L.map('map').setView([-10.1847, -48.3336], 13);
-
-        L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-                attribution: 'OpenStreetMap'
-            }
-        ).addTo(map);
-
-        let marker;
-
-        navigator.geolocation.getCurrentPosition((position) => {
-
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            map.setView([lat, lng], 15);
-
-            marker = L.marker([lat, lng]).addTo(map);
-
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
-
-        });
-
-        map.on('click', function(e) {
-
-            const lat = e.latlng.lat;
-            const lng = e.latlng.lng;
-
-            if (marker) {
-                map.removeLayer(marker);
-            }
-
-            marker = L.marker([lat, lng]).addTo(map);
-
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
-
-        });
-
-    </script>
-
-</body>
-</html>
+  map.on('click', function(e) {
+    setMarker(e.latlng.lat, e.latlng.lng);
+  });
+</script>
+{% endblock %}

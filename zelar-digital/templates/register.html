@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Criar conta | Zelar Digital{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="container auth-grid">
+    <div class="panel auth-hero">
+      <div>
+        <span class="kicker" style="background: rgba(255,255,255,.12); color: #fff;">Novo acesso</span>
+        <h1 style="margin:16px 0 0; font-size: clamp(2.4rem, 5vw, 4rem); line-height: .96; letter-spacing:-.05em;">Crie sua conta para usar o portal de ocorrências.</h1>
+        <p style="max-width: 56ch; font-size: 1.02rem; line-height: 1.75; margin-top: 14px;">
+          O cadastro libera o envio de novas solicitações com foto, localização e acompanhamento posterior.
+        </p>
+      </div>
+      <div class="auth-list">
+        <div>Interface consistente com o restante do painel.</div>
+        <div>Campos claros e com foco em conversão.</div>
+        <div>Fluxo simples para cidadãos e equipes internas.</div>
+      </div>
+    </div>
+
+    <div class="panel auth-panel">
+      <h2 style="margin-top:0;">Criar conta</h2>
+      <p class="muted">Preencha os dados abaixo para se cadastrar.</p>
+      <form method="POST" class="form-grid" style="margin-top:20px;">
+        <div class="field">
+          <label for="username">Nome</label>
+          <input type="text" name="username" id="username" placeholder="Seu nome" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email" placeholder="voce@exemplo.com" required>
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input type="password" name="password" id="password" placeholder="Mínimo de 6 caracteres" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%;">Criar conta</button>
+      </form>
+      <p class="small-note" style="margin-top:16px;">Já possui conta? <a href="{{ url_for('auth.login') }}" style="color: var(--primary); font-weight: 700;">Entrar agora</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

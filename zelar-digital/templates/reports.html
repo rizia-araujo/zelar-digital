@@ -1,115 +1,78 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% extends "base.html" %}
+{% block title %}Ocorrências | Zelar Digital{% endblock %}
+{% block content %}
+<section class="page-shell">
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h1>Ocorrências da cidade</h1>
+        <p>{{ total_reports }} registros encontrados.</p>
+      </div>
+      <div class="toolbar">
+        <a class="pill {% if not active_status %}active{% endif %}" href="{{ url_for('reports.list_reports') }}">Todas</a>
+        <a class="pill {% if active_status == 'recebido' %}active{% endif %}" href="{{ url_for('reports.list_reports', status='recebido') }}">Recebidas</a>
+        <a class="pill {% if active_status == 'em andamento' %}active{% endif %}" href="{{ url_for('reports.list_reports', status='em andamento') }}">Em andamento</a>
+        <a class="pill {% if active_status == 'resolvido' %}active{% endif %}" href="{{ url_for('reports.list_reports', status='resolvido') }}">Resolvidas</a>
+      </div>
+    </div>
 
-<head>
+    <div class="panel map-card" style="margin-bottom:18px; min-height: 500px;">
+      <div class="map-overlay">
+        <strong>Visão geográfica</strong>
+        <div class="helper">Os pontos abaixo representam as ocorrências cadastradas no sistema.</div>
+      </div>
+      <div id="map" style="min-height:500px;"></div>
+    </div>
 
-    <meta charset="UTF-8">
+    <div class="report-list">
+      {% for report in reports %}
+        <article class="report-item">
+          <div class="thumb">
+            <img src="{{ url_for('static', filename='uploads/' ~ report.image) }}" alt="{{ report.title }}">
+          </div>
+          <div>
+            <div class="badge {{ report.status|replace(' ', '.') }}">{{ report.status }}</div>
+            <h3 style="margin: 12px 0 8px;">{{ report.title }}</h3>
+            <p class="muted" style="margin:0;">{{ report.description }}</p>
+          </div>
+          <div class="small-note">
+            <div>{{ report.created_at }}</div>
+            <div style="margin-top:8px;">{{ report.latitude }}, {{ report.longitude }}</div>
+          </div>
+        </article>
+      {% else %}
+        <div class="card empty-state">Nenhuma ocorrência para exibir no momento.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
 
-    <title>Ocorrências</title>
+{% block scripts %}
+<script>
+  const map = L.map('map').setView([-10.1847, -48.3336], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'OpenStreetMap'
+  }).addTo(map);
 
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet/dist/leaflet.css"
-    />
+  const reports = {{ reports | tojson }};
+  const bounds = [];
 
-    <style>
+  reports.forEach(report => {
+    const lat = parseFloat(report.latitude);
+    const lng = parseFloat(report.longitude);
+    if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup(`
+        <strong>${report.title}</strong><br>
+        <span>${report.status}</span>
+      `);
+      bounds.push([lat, lng]);
+    }
+  });
 
-        body {
-            font-family: Arial;
-            margin: 20px;
-        }
-
-        .card {
-
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-
-        }
-
-        img {
-
-            width: 300px;
-            border-radius: 10px;
-
-        }
-
-        #map {
-
-            height: 500px;
-            margin-bottom: 30px;
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <h1>Ocorrências da Cidade</h1>
-
-    <div id="map"></div>
-
-    {% for report in reports %}
-
-        <div class="card">
-
-            <h2>{{ report[1] }}</h2>
-
-            <p>{{ report[2] }}</p>
-
-            <p>
-                <strong>Status:</strong>
-                {{ report[6] }}
-            </p>
-
-            <img
-                src="{{ url_for('static', filename='uploads/' + report[3]) }}"
-            >
-
-            <p>
-                Latitude: {{ report[4] }}
-            </p>
-
-            <p>
-                Longitude: {{ report[5] }}
-            </p>
-
-        </div>
-
-    {% endfor %}
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-    <script>
-
-        const map = L.map('map').setView([-10.1847, -48.3336], 13);
-
-        L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-                attribution: 'OpenStreetMap'
-            }
-        ).addTo(map);
-
-        const reports = {{ reports | tojson }};
-
-        reports.forEach(report => {
-
-            const lat = report[4];
-            const lng = report[5];
-
-            const marker = L.marker([lat, lng]).addTo(map);
-
-            marker.bindPopup(`
-                <b>${report[1]}</b><br>
-                ${report[6]}
-            `);
-
-        });
-
-    </script>
-
-</body>
-</html>
+  if (bounds.length > 0) {
+    map.fitBounds(bounds, { padding: [30, 30] });
+  }
+</script>
+{% endblock %}

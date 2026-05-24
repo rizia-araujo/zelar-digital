@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Entrar | Zelar Digital{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="container auth-grid">
+    <div class="panel auth-hero">
+      <div>
+        <span class="kicker" style="background: rgba(255,255,255,.12); color: #fff;">Acesso seguro</span>
+        <h1 style="margin:16px 0 0; font-size: clamp(2.4rem, 5vw, 4rem); line-height: .96; letter-spacing:-.05em;">Entre para registrar e acompanhar as demandas da cidade.</h1>
+        <p style="max-width: 56ch; font-size: 1.02rem; line-height: 1.75; margin-top: 14px;">
+          O painel foi desenhado para manter a navegação simples, com foco em leitura, confiança e rapidez no envio de ocorrências.
+        </p>
+      </div>
+      <div class="auth-list">
+        <div>Mapa interativo para definir a localização exata.</div>
+        <div>Upload de imagem para evidenciar a ocorrência.</div>
+        <div>Status operacional organizado por etapa.</div>
+      </div>
+    </div>
+
+    <div class="panel auth-panel">
+      <h2 style="margin-top:0;">Entrar</h2>
+      <p class="muted">Use seu email e senha para acessar o sistema.</p>
+      <form method="POST" class="form-grid" style="margin-top:20px;">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email" placeholder="voce@exemplo.com" required>
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input type="password" name="password" id="password" placeholder="Sua senha" required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width:100%;">Entrar</button>
+      </form>
+      <p class="small-note" style="margin-top:16px;">Não tem conta? <a href="{{ url_for('auth.register') }}" style="color: var(--primary); font-weight: 700;">Criar cadastro</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

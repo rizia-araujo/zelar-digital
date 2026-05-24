@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Zelar Digital | Início{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="panel hero-main">
+      <span class="kicker">Atendimento cidadão · Palmas-TO</span>
+      <h1 class="h1">Uma central moderna para <span class="accent">registrar</span> e acompanhar ocorrências da cidade.</h1>
+      <p class="lead">
+        Interface pronta para integrar com o backend Flask, com foco em usabilidade, leitura rápida e visual institucional inspirado no design system enviado.
+      </p>
+      <div class="hero-actions">
+        {% if current_user.is_authenticated %}
+          <a class="btn btn-primary" href="{{ url_for('reports.create_report') }}">Registrar ocorrência</a>
+          <a class="btn btn-secondary" href="{{ url_for('reports.list_reports') }}">Ver painel</a>
+        {% else %}
+          <a class="btn btn-primary" href="{{ url_for('auth.login') }}">Entrar na plataforma</a>
+          <a class="btn btn-secondary" href="{{ url_for('auth.register') }}">Criar conta</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <aside class="panel hero-side">
+      <div class="stat-grid">
+        <div class="stat">
+          <strong>{{ stats.total }}</strong>
+          <span>Ocorrências registradas</span>
+        </div>
+        <div class="stat">
+          <strong>{{ stats.received }}</strong>
+          <span>Recebidas</span>
+        </div>
+        <div class="stat">
+          <strong>{{ stats.progress }}</strong>
+          <span>Em andamento</span>
+        </div>
+        <div class="stat">
+          <strong>{{ stats.resolved }}</strong>
+          <span>Resolvidas</span>
+        </div>
+      </div>
+      <div class="side-card">
+        <h3>Fluxo de atendimento</h3>
+        <p>Registro com geolocalização, foto e status para facilitar a triagem da equipe e a visualização cidadã.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <div>
+        <h2>Recursos principais</h2>
+        <p>Layout limpo, responsivo e conectado ao backend.</p>
+      </div>
+      <a class="btn btn-ghost" href="{{ url_for('reports.list_reports') }}">Abrir relatório completo</a>
+    </div>
+
+    <div class="grid-3">
+      <article class="card">
+        <div class="card-body">
+          <div class="feature">
+            <div class="feature-icon">◎</div>
+            <div>
+              <h3>Registro com mapa</h3>
+              <p>Captura de localização por clique no mapa ou geolocalização do dispositivo.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <div class="feature">
+            <div class="feature-icon">◌</div>
+            <div>
+              <h3>Identidade institucional</h3>
+              <p>Paleta inspirada em Palmas, com verde-azulado, azul profundo e superfícies claras.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <div class="feature">
+            <div class="feature-icon">⬡</div>
+            <div>
+              <h3>Pronto para o backend</h3>
+              <p>Flask, MySQL, login, cadastro e páginas operacionais já conectadas às rotas existentes.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <div>
+        <h2>Últimas ocorrências</h2>
+        <p>Os quatro registros mais recentes aparecem abaixo.</p>
+      </div>
+    </div>
+
+    <div class="report-list">
+      {% for report in recent_reports %}
+        <article class="report-item">
+          <div class="thumb">
+            <img src="{{ url_for('static', filename='uploads/' ~ report.image) }}" alt="{{ report.title }}">
+          </div>
+          <div>
+            <div class="badge {{ report.status|replace(' ', '.') }}">{{ report.status }}</div>
+            <h3 style="margin: 12px 0 8px;">{{ report.title }}</h3>
+            <p class="muted" style="margin:0;">{{ report.description[:160] }}{% if report.description|length > 160 %}...{% endif %}</p>
+          </div>
+          <div class="small-note">
+            {{ report.created_at }}
+          </div>
+        </article>
+      {% else %}
+        <div class="card empty-state">Ainda não há ocorrências registradas.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
