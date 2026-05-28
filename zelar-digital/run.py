@@ -20,6 +20,10 @@ app.config["MYSQL_DB"] = os.getenv("MYSQL_DB")
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
+if __name__ == '__main__':
+    # host='0.0.0.0' permite que o WSL compartilhe a porta externamente
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
 uploads_dir = os.path.join(app.root_path, "app", "static", "uploads")
 os.makedirs(uploads_dir, exist_ok=True)
 
